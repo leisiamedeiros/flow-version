@@ -1,10 +1,10 @@
-import { Component } from 'react'
+import { ChangeEvent, Component } from 'react'
 import { Commands, SendCommand } from '../../application/Commands';
 import AppHeaders, { HeadersAttributes } from '../../application/Headers';
-import { PublishedFlowResponse, BackupFlow } from '../../interfaces/Resources';
-import Utilities from '../../shared/utilities';
+import { PublishedFlowResponse } from '../../interfaces/Resources';
 import Layout from '../layout/Layout';
 import Alert from '../alert/Alert';
+import { handleFlowContent } from '../../shared/modelsHandle';
 
 export default class Home extends Component<any, any> {
 
@@ -21,7 +21,7 @@ export default class Home extends Component<any, any> {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    async handleChange(event: any) {
+    async handleChange(event: ChangeEvent<HTMLInputElement>) {
         this.setState({
             authorization: event.target.value
         });
@@ -46,7 +46,7 @@ export default class Home extends Component<any, any> {
     }
 
     async createBackup(resource: PublishedFlowResponse, headers: object) {
-        let backupFlow = this.handleFlowContent(resource);
+        let backupFlow = handleFlowContent(resource);
         if (!backupFlow) return;
 
         let commandBody = Commands.createBackupFlow(backupFlow.flow, backupFlow.version);
@@ -67,18 +67,6 @@ export default class Home extends Component<any, any> {
             });
 
         this.hideAlert(5000);
-    }
-
-    handleFlowContent(resource: PublishedFlowResponse): BackupFlow | undefined {
-        if (!resource) return undefined;
-        const flow = JSON.stringify(resource.resource);
-
-        let bkpFlow = {} as BackupFlow;
-        bkpFlow.flow = JSON.parse(flow);
-        bkpFlow.version = `backup_flow:${Utilities.generateVersion()}`;
-        bkpFlow.botName = resource.to.split("@")[0] ?? "";
-
-        return bkpFlow;
     }
 
     render() {
