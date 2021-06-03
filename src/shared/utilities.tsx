@@ -6,4 +6,19 @@ export default class Utilities {
             return variant.toString(16);
         });
     }
+
+    static generateVersion(): string {
+        const today = new Date();
+        const month = (today.getMonth() + 1);
+        return `${today.getFullYear()}${month}${today.getDate()}${today.getHours()}${today.getMinutes()}${today.getSeconds()}`;
+    }
+
+    static countElementsByKey(items: string[], key: string): number {
+        return items.filter(el => el.includes(key)).length;
+    }
+
+    static returnElementsByKey(items: string[], key: string): string[] {
+        return items.filter(el => el.includes(key));
+    }
+
 }

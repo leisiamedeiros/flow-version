@@ -1,8 +1,10 @@
-import React, { Component } from 'react'
-import Api from '../application/Api';
-import AppHeaders, { HeadersAttributes } from '../application/Headers';
-import Utilities from '../shared/utilities';
-import Layout from './Layout/Layout'
+import { Component } from 'react'
+import { Commands, SendCommand } from '../../application/Commands';
+import AppHeaders, { HeadersAttributes } from '../../application/Headers';
+import { PublishedFlowResponse, BackupFlow } from '../../interfaces/Resources';
+import Utilities from '../../shared/utilities';
+import Layout from '../layout/Layout'
+
 
 export default class Home extends Component<any, any> {
 
@@ -24,25 +26,34 @@ export default class Home extends Component<any, any> {
 
     async handleSubmit() {
         const appHeaders: HeadersAttributes = { authorization: this.state.authorization };
-        let headers = AppHeaders.buildHeaders(appHeaders);
+        let headers = AppHeaders.buildBlipHeaders(appHeaders);
 
-        let data = {
-            "id": `"${Utilities.uuidv4()}"`,
-            "method": "get",
-            "uri": "/buckets/blip_portal:builder_published_flow"
-        }
+        let commandBody = Commands.getPublishedFlow();
+        let result = await SendCommand(commandBody, headers);
 
-        await this.CallApi(data, headers);
+        await this.createBackup(result.data, headers);
     }
 
-    async CallApi(data: any, headers: any) {
+    async createBackup(resource: PublishedFlowResponse, headers: object) {
+        let backupFlow = this.handleFlowContent(resource);
+        if (!backupFlow) return;
 
-        let result = await Api.post(
-            "https://msging.net/commands", data, { headers }
-        );
+        let commandBody = Commands.createBackupFlow(backupFlow.flow, backupFlow.version);
+        console.log(commandBody);
+        let result = await SendCommand(commandBody, headers);
+        console.log(result);
+    }
 
-        console.log(result.data);
-        console.log(result.data.resource);
+    handleFlowContent(resource: PublishedFlowResponse): BackupFlow | undefined {
+        if (!resource) return undefined;
+        const flow = JSON.stringify(resource.resource);
+
+        let bkpFlow = {} as BackupFlow;
+        bkpFlow.flow = JSON.parse(flow);
+        bkpFlow.version = `backup_flow:${Utilities.generateVersion()}`;
+        bkpFlow.botName = resource.to.split("@")[0] ?? "";
+
+        return bkpFlow;
     }
 
     render() {
