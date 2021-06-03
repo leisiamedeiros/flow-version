@@ -3,8 +3,8 @@ import { Commands, SendCommand } from '../../application/Commands';
 import AppHeaders, { HeadersAttributes } from '../../application/Headers';
 import { PublishedFlowResponse, BackupFlow } from '../../interfaces/Resources';
 import Utilities from '../../shared/utilities';
-import Layout from '../layout/Layout'
-
+import Layout from '../layout/Layout';
+import Alert from '../alert/Alert';
 
 export default class Home extends Component<any, any> {
 
@@ -12,7 +12,10 @@ export default class Home extends Component<any, any> {
         super(props);
 
         this.state = {
-            authorization: ''
+            authorization: '',
+            mustShowMessage: false,
+            message: '',
+            statusMessage: ''
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -29,9 +32,17 @@ export default class Home extends Component<any, any> {
         let headers = AppHeaders.buildBlipHeaders(appHeaders);
 
         let commandBody = Commands.getPublishedFlow();
-        let result = await SendCommand(commandBody, headers);
 
-        await this.createBackup(result.data, headers);
+        await SendCommand(commandBody, headers).then(response => {
+            this.createBackup(response.data, headers);
+        }).catch(err => {
+            this.setState({
+                message: `Não foi possível obter o fluxo! ${err.message}`,
+                statusMessage: 'danger',
+                mustShowMessage: true
+            })
+        });
+        this.hideAlert(4000);
     }
 
     async createBackup(resource: PublishedFlowResponse, headers: object) {
@@ -39,9 +50,23 @@ export default class Home extends Component<any, any> {
         if (!backupFlow) return;
 
         let commandBody = Commands.createBackupFlow(backupFlow.flow, backupFlow.version);
-        console.log(commandBody);
-        let result = await SendCommand(commandBody, headers);
-        console.log(result);
+
+        await SendCommand(commandBody, headers)
+            .then(response => {
+                this.setState({
+                    message: `Backup ${backupFlow?.version} criado com sucesso! `,
+                    statusMessage: 'success',
+                    mustShowMessage: true
+                })
+            }).catch(err => {
+                this.setState({
+                    message: `Não foi possível efetuar o backup! ${err.message}`,
+                    statusMessage: 'danger',
+                    mustShowMessage: true
+                })
+            });
+
+        this.hideAlert(5000);
     }
 
     handleFlowContent(resource: PublishedFlowResponse): BackupFlow | undefined {
@@ -60,6 +85,7 @@ export default class Home extends Component<any, any> {
         return (
             <Layout>
                 <div>
+                    {this.alertComponent()}
                     <div className="mb-3">
                         <label htmlFor="inputAuthorization" className="form-label">Authorization</label>
                         <input type="text" name="authorization" className="form-control" id="inputAuthorization"
@@ -72,6 +98,19 @@ export default class Home extends Component<any, any> {
                 </div>
             </Layout>
         )
+    }
+
+    alertComponent() {
+        if (this.state.mustShowMessage)
+            return <Alert message={this.state.message} classColor={this.state.statusMessage} />
+    }
+
+    hideAlert(seconds: number) {
+        setTimeout(() => {
+            this.setState({
+                mustShowMessage: false
+            })
+        }, seconds);
     }
 
 }
