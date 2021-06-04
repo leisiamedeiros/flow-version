@@ -2,7 +2,7 @@ version: '3'
 
 services:
 
-  poppinsweb:
+  flowversion:
     image: flowversion:beta
     container_name: flowversion
     build:
