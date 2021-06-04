@@ -1,34 +1,22 @@
-import { ChangeEvent, Component } from 'react'
 import { Commands, SendCommand } from '../../application/Commands';
 import AppHeaders, { HeadersAttributes } from '../../application/Headers';
 import { PublishedFlowResponse } from '../../interfaces/Resources';
 import Layout from '../layout/Layout';
 import Alert from '../alert/Alert';
 import { handleFlowContent } from '../../shared/modelsHandle';
+import { MainComponent } from '../../shared/mainComponent';
 
-export default class Home extends Component<any, any> {
+interface HomeState {
+    authorization: string,
+}
+export default class Home extends MainComponent<HomeState>{
 
     constructor(props: any) {
         super(props);
-
-        this.state = {
-            authorization: '',
-            mustShowMessage: false,
-            message: '',
-            statusMessage: ''
-        }
-
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    async handleChange(event: ChangeEvent<HTMLInputElement>) {
-        this.setState({
-            authorization: event.target.value
-        });
     }
 
     async handleSubmit() {
-        const appHeaders: HeadersAttributes = { authorization: this.state.authorization };
+        const appHeaders: HeadersAttributes = { authorization: this.state.payload.authorization };
         let headers = AppHeaders.buildBlipHeaders(appHeaders);
 
         let commandBody = Commands.getPublishedFlow();
@@ -36,13 +24,11 @@ export default class Home extends Component<any, any> {
         await SendCommand(commandBody, headers).then(response => {
             this.createBackup(response.data, headers);
         }).catch(err => {
-            this.setState({
-                message: `Não foi possível obter o fluxo! ${err.message}`,
-                statusMessage: 'danger',
-                mustShowMessage: true
-            })
+            this.setAlert(
+                `Não foi possível obter o fluxo! ${err.message}`,
+                'danger'
+            )
         });
-        this.hideAlert(4000);
     }
 
     async createBackup(resource: PublishedFlowResponse, headers: object) {
@@ -53,23 +39,19 @@ export default class Home extends Component<any, any> {
 
         await SendCommand(commandBody, headers)
             .then(response => {
-                this.setState({
-                    message: `Backup ${backupFlow?.version} criado com sucesso! `,
-                    statusMessage: 'success',
-                    mustShowMessage: true
-                })
+                this.setAlert(
+                    `Backup ${backupFlow?.version} criado com sucesso! `,
+                    'success',
+                )
             }).catch(err => {
-                this.setState({
-                    message: `Não foi possível efetuar o backup! ${err.message}`,
-                    statusMessage: 'danger',
-                    mustShowMessage: true
-                })
+                this.setAlert(
+                    `Não foi possível efetuar o backup! ${err.message}`,
+                    'danger',
+                )
             });
-
-        this.hideAlert(5000);
     }
 
-    render() {
+    build() {
         return (
             <Layout>
                 <div>
@@ -77,7 +59,7 @@ export default class Home extends Component<any, any> {
                     <div className="mb-3">
                         <label htmlFor="inputAuthorization" className="form-label">Authorization</label>
                         <input type="text" name="authorization" className="form-control" id="inputAuthorization"
-                            aria-describedby="authorizationHelp" value={this.state.authorization} onChange={this.handleChange} />
+                            aria-describedby="authorizationHelp" value={this.state.payload.authorization} onChange={this.handleChange} />
                         <div id="authorizationHelp" className="form-text">
                             O (Authorization) fica disponivel em "Informações de conexão" dentro de configurações.
                         </div>
@@ -89,16 +71,13 @@ export default class Home extends Component<any, any> {
     }
 
     alertComponent() {
-        if (this.state.mustShowMessage)
-            return <Alert message={this.state.message} classColor={this.state.statusMessage} />
-    }
-
-    hideAlert(seconds: number) {
-        setTimeout(() => {
-            this.setState({
-                mustShowMessage: false
-            })
-        }, seconds);
+        if (this.state.showAlert) {
+            return <Alert
+                message={this.state.alertMessage}
+                classColor={this.state.alertClass}
+                onClose={() => this.hideAlert()}
+            />
+        }
     }
 
 }
