@@ -59,7 +59,7 @@ export default class Home extends MainComponent<HomeState>{
                     <div className="mb-3">
                         <label htmlFor="inputAuthorization" className="form-label">Authorization</label>
                         <input type="text" name="authorization" className="form-control" id="inputAuthorization"
-                            aria-describedby="authorizationHelp" value={this.state.payload.authorization} onChange={this.handleChange} />
+                            aria-describedby="authorizationHelp" onChange={this.handleChange} />
                         <div id="authorizationHelp" className="form-text">
                             O (Authorization) fica disponivel em "Informações de conexão" dentro de configurações.
                         </div>
