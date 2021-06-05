@@ -5,8 +5,8 @@ services:
   flowversion:
     image: leisiamedeiros/flowversion:beta
     container_name: flowversion
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     ports:
       - "3000:80"

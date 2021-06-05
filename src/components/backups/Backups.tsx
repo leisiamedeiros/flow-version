@@ -54,6 +54,8 @@ export default class Backups extends MainComponent<ResourceItems> {
     }
 
     async handleSubmitBackup() {
+        // TODO: Verificar limite de 5 backups
+
         let commandBody = Commands.getPublishedFlow();
 
         await SendCommand(commandBody, this.headers).then(response => {
