@@ -1,4 +1,3 @@
-
 export interface ISessionUser {
     username: string;
 }
@@ -19,7 +18,7 @@ export default class SessionUser {
 
 export class Session {
 
-    static async set(key: string, value: any) {
+    static set(key: string, value: any) {
         sessionStorage.setItem(key, JSON.stringify(value));
     }
 
@@ -30,5 +29,14 @@ export class Session {
             return await JSON.parse(sessionResult) as T;
         else
             return null;
+    }
+
+    static getKeyString(key: string): string | null {
+        return sessionStorage.getItem(key);
+    }
+
+    static clear() {
+        sessionStorage.clear();
+        window.location.reload();
     }
 }

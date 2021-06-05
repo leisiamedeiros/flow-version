@@ -5,6 +5,14 @@ const COMMANDS_URL = "https://msging.net/commands";
 
 class Commands {
 
+    static getCheckConnectivity() {
+        return {
+            "id": `${Utilities.uuidv4()}`,
+            "method": "get",
+            "uri": "/ping"
+        }
+    }
+
     static getPublishedFlow() {
         return {
             "id": `${Utilities.uuidv4()}`,
@@ -27,6 +35,15 @@ class Commands {
         return {
             "id": `${Utilities.uuidv4()}`,
             "method": "get",
+            "uri": `/buckets/${version}`
+        }
+    }
+
+    static deleteBackupFlow(version: string) {
+        return {
+            "id": `${Utilities.uuidv4()}`,
+            "to": "postmaster@msging.net",
+            "method": "delete",
             "uri": `/buckets/${version}`
         }
     }
