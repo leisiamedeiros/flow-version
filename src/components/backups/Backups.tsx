@@ -5,7 +5,7 @@ import { Session } from '../../application/Session';
 import { PublishedFlowResponse } from '../../interfaces/Resources';
 import { MainComponent } from '../../shared/mainComponent'
 import { handleFlowContent } from '../../shared/modelsHandle';
-import Utilities from '../../shared/utilities';
+import { handleDownloadFile, Utilities } from '../../shared/utilities';
 import Layout from '../layout/Layout'
 
 interface ResourceItems {
@@ -21,8 +21,15 @@ export default class Backups extends MainComponent<ResourceItems> {
     componentDidMount() {
         if (!this.authorization) {
             this.redirectTo('/');
+        } else {
+            this.getBackups();
         }
-        this.getBackups();
+    }
+
+    componentWillUnmount() {
+        this.setState = (state, callback) => {
+            return;
+        };
     }
 
     async getBackups() {
@@ -100,18 +107,14 @@ export default class Backups extends MainComponent<ResourceItems> {
         let commandBody = Commands.getBackupFlow(version);
 
         await SendCommand(commandBody, this.headers).then(response => {
-            this.handleDownloadFile(response.data.resource);
+            const setringfyFlow = JSON.stringify(response.data.resource);
+            handleDownloadFile(setringfyFlow, version);
         }).catch(err => {
             this.setAlert(
                 `Não foi possível obter o backup! ${err.message}`,
                 'danger'
             )
         });
-    }
-
-    handleDownloadFile(onboarding: object) {
-        let valueString = JSON.stringify(onboarding);
-
     }
 
     build(): JSX.Element {

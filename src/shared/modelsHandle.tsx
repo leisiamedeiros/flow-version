@@ -1,5 +1,5 @@
 import { PublishedFlowResponse, BackupFlow } from "../interfaces/Resources";
-import Utilities from "./utilities";
+import { Utilities } from "./utilities";
 
 function handleFlowContent(resource: PublishedFlowResponse): BackupFlow | undefined {
     if (!resource) return undefined;

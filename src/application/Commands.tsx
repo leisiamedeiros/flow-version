@@ -1,4 +1,4 @@
-import Utilities from "../shared/utilities";
+import { Utilities } from "../shared/utilities";
 import Api from "./Api";
 
 const COMMANDS_URL = "https://msging.net/commands";

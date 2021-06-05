@@ -1,4 +1,4 @@
-export default class Utilities {
+class Utilities {
 
     static uuidv4(): string {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
@@ -21,4 +21,23 @@ export default class Utilities {
         return items.filter(el => el.includes(key));
     }
 
+}
+
+function handleDownloadFile(content: string, version: string) {
+    const file = new Blob([content]);
+
+    const element = document.createElement("a");
+    element.href = URL.createObjectURL(file);
+    element.download = `${version}.json`;
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+    document.body.removeChild(element);
+}
+
+export {
+    Utilities,
+    handleDownloadFile
 }
