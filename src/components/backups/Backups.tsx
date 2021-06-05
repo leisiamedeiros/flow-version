@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Commands, SendCommand } from '../../application/Commands';
 import AppHeaders, { HeadersAttributes } from '../../application/Headers';
@@ -54,8 +55,6 @@ export default class Backups extends MainComponent<ResourceItems> {
     }
 
     async handleSubmitBackup() {
-        // TODO: Verificar limite de 5 backups
-
         let commandBody = Commands.getPublishedFlow();
 
         await SendCommand(commandBody, this.headers).then(response => {
@@ -128,8 +127,9 @@ export default class Backups extends MainComponent<ResourceItems> {
 
                         <div className="card">
                             <div className="card-body">
-                                <h6>Para realizar um backup do ultimo fluxo publicado click no botao abaixo</h6>
-                                <button type="submit" className="btn btn-success" onClick={() => this.handleSubmitBackup()}>Backup</button>
+                                {
+                                    this.state.payload.items?.length > 4 ? this.cantBackup() : this.backupButton()
+                                }
                             </div>
                         </div>
 
@@ -165,5 +165,22 @@ export default class Backups extends MainComponent<ResourceItems> {
                 <Link to="/" className="btn btn-secondary">Voltar</Link>
             </Layout>
         )
+    }
+
+    backupButton(): JSX.Element {
+        return (
+            <Fragment>
+                <h6>Para realizar um backup do ultimo fluxo publicado click no botao abaixo</h6>
+                <button type="submit" className="btn btn-success" onClick={() => this.handleSubmitBackup()}>Backup</button>
+            </Fragment>
+        );
+    }
+
+    cantBackup(): JSX.Element {
+        return (
+            <Fragment>
+                <h6>Você atingiu o limite disponivel de backups, para realizar um novo backup remova um existente!</h6>
+            </Fragment>
+        );
     }
 }
