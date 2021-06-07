@@ -1,10 +1,10 @@
-import { Commands, SendCommand } from '../../application/Commands';
 import AppHeaders, { HeadersAttributes } from '../../application/Headers';
 import Layout from '../layout/Layout';
 import { MainComponent } from '../../shared/mainComponent';
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Session } from '../../application/Session';
+import { getCheckConnectivity, SendCommand } from '../../commands/Connectivity';
 
 interface HomeState {
     authorization: string,
@@ -28,7 +28,7 @@ export default class Home extends MainComponent<HomeState>{
         const appHeaders: HeadersAttributes = { authorization: this.state.payload.authorization };
         let headers = AppHeaders.buildBlipHeaders(appHeaders);
 
-        let commandBody = Commands.getCheckConnectivity();
+        let commandBody = getCheckConnectivity();
         await SendCommand(commandBody, headers).then(response => {
             this.storeKey();
         }).catch(err => {
@@ -95,7 +95,7 @@ export default class Home extends MainComponent<HomeState>{
                                 <p className="card-text">Transfira os recursos deste chatbot para outro</p>
                             </div>
                             <div className="card-footer bg-transparent border-light">
-                                <Link to="/" className="btn btn-primary">Selecionar</Link>
+                                <Link to="/resources" className="btn btn-primary">Selecionar</Link>
                             </div>
                         </div>
                     </div>

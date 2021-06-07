@@ -1,11 +1,9 @@
-export interface PublishedFlowResponse {
-    resource: string;
-    to: string;
-    id: string;
+export interface ResourceResponse {
+    total: number;
+    items: string[];
 }
 
-export interface BackupFlow {
-    botName: string;
-    version: string;
-    flow: object;
+export interface Resource {
+    type: string;
+    resource: string;
 }

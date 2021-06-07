@@ -1,21 +1,3 @@
-export interface ISessionUser {
-    username: string;
-}
-
-export default class SessionUser {
-
-    static getUserSession(): ISessionUser | null {
-        let user = sessionStorage.getItem("user");
-        if (user == null) return null;
-
-        return JSON.parse(user) as ISessionUser;
-    }
-
-    static registerUserSession(user: ISessionUser) {
-        sessionStorage.setItem("user", JSON.stringify(user));
-    }
-}
-
 export class Session {
 
     static set(key: string, value: any) {
