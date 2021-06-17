@@ -1,6 +1,11 @@
 # Flow Version
 
-This app is able to get and publish a json flow on bucket's chatbot
+This app is able to get and publish a json flow on bucket's chatbot as well as import resources from a chatbot to another.
+
+# Flow Backup
+
+![flowversion](https://user-images.githubusercontent.com/10652534/122388081-e95fe100-cf45-11eb-9071-c068cf32d06b.gif)
+
 
 ## Available Scripts
 
