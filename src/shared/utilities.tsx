@@ -21,6 +21,10 @@ class Utilities {
         return items.filter(el => el.includes(key));
     }
 
+    static returnBotName(uri: string): string {
+        return uri.split("@")[0] ?? ""
+    }
+
 }
 
 function handleDownloadFile(content: string, version: string) {

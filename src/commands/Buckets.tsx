@@ -1,17 +1,6 @@
-import { Utilities } from "../shared/utilities";
-import Api from "./Api";
+import { Utilities } from "../shared/utilities"
 
-const COMMANDS_URL = "https://msging.net/commands";
-
-class Commands {
-
-    static getCheckConnectivity() {
-        return {
-            "id": `${Utilities.uuidv4()}`,
-            "method": "get",
-            "uri": "/ping"
-        }
-    }
+export default class Buckets {
 
     static getPublishedFlow() {
         return {
@@ -56,17 +45,4 @@ class Commands {
             "uri": "/buckets"
         }
     }
-}
-
-async function SendCommand(body: object, headers: object) {
-    return await Api.post(
-        COMMANDS_URL, body, { headers }
-    );
-}
-
-
-export {
-    COMMANDS_URL,
-    Commands,
-    SendCommand
 }

@@ -1,13 +1,14 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import { Commands, SendCommand } from '../../application/Commands';
 import AppHeaders, { HeadersAttributes } from '../../application/Headers';
 import { Session } from '../../application/Session';
-import { PublishedFlowResponse } from '../../interfaces/Resources';
+import Buckets from '../../commands/Buckets';
+import { SendCommand } from '../../commands/Connectivity';
+import { PublishedFlowResponse } from '../../interfaces/Flow';
 import { MainComponent } from '../../shared/mainComponent'
 import { handleFlowContent } from '../../shared/modelsHandle';
 import { handleDownloadFile, Utilities } from '../../shared/utilities';
-import Layout from '../layout/Layout'
+import Layout from '../layout/Layout';
 
 interface ResourceItems {
     items: string[];
@@ -34,7 +35,7 @@ export default class Backups extends MainComponent<ResourceItems> {
     }
 
     async getBackups() {
-        let commandBody = Commands.getAllBackups();
+        let commandBody = Buckets.getAllBackups();
         await SendCommand(commandBody, this.headers).then(response => {
             this.handleListBackups(response.data.resource);
         }).catch(err => {
@@ -55,7 +56,7 @@ export default class Backups extends MainComponent<ResourceItems> {
     }
 
     async handleSubmitBackup() {
-        let commandBody = Commands.getPublishedFlow();
+        let commandBody = Buckets.getPublishedFlow();
 
         await SendCommand(commandBody, this.headers).then(response => {
             this.createBackup(response.data, this.headers);
@@ -71,7 +72,7 @@ export default class Backups extends MainComponent<ResourceItems> {
         let backupFlow = handleFlowContent(resource);
         if (!backupFlow) return;
 
-        let commandBody = Commands.createBackupFlow(backupFlow.flow, backupFlow.version);
+        let commandBody = Buckets.createBackupFlow(backupFlow.flow, backupFlow.version);
         await SendCommand(commandBody, headers)
             .then(response => {
                 this.setAlert(
@@ -88,7 +89,7 @@ export default class Backups extends MainComponent<ResourceItems> {
     }
 
     async deleteBackup(version: string) {
-        let commandBody = Commands.deleteBackupFlow(version);
+        let commandBody = Buckets.deleteBackupFlow(version);
 
         await SendCommand(commandBody, this.headers).then(response => {
             this.setAlert(
@@ -105,7 +106,7 @@ export default class Backups extends MainComponent<ResourceItems> {
     }
 
     async downloadFile(version: string) {
-        let commandBody = Commands.getBackupFlow(version);
+        let commandBody = Buckets.getBackupFlow(version);
 
         await SendCommand(commandBody, this.headers).then(response => {
             const setringfyFlow = JSON.stringify(response.data.resource);
