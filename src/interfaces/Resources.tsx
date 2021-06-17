@@ -5,5 +5,6 @@ export interface ResourceResponse {
 
 export interface Resource {
     type: string;
-    resource: string;
+    resource: string | object;
+    resourceKey: string;
 }

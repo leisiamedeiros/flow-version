@@ -1,15 +1,17 @@
 import AppHeaders, { HeadersAttributes } from '../../application/Headers';
 import { Session } from '../../application/Session';
-import { SendCommand } from '../../commands/Connectivity';
+import { getCheckConnectivity, SendCommand } from '../../commands/Connectivity';
 import ResourcesCommands from '../../commands/Resources';
 import { Resource, ResourceResponse } from '../../interfaces/Resources';
 import { MainComponent } from '../../shared/mainComponent';
+import { Utilities } from '../../shared/utilities';
 import Layout from '../layout/Layout';
 
 interface ResourceState extends Resource {
     destinationAuthorization: string;
     resourceKey: string;
     resources: ResourceResponse;
+    resourcesDetails: Resource[];
 }
 export default class Resources extends MainComponent<ResourceState> {
 
@@ -49,8 +51,21 @@ export default class Resources extends MainComponent<ResourceState> {
 
     async getResourceDetails(resources: ResourceResponse) {
         let commandBody;
-        resources.items.forEach(resKey => {
+        let resourcesDetails = [] as Resource[];
+
+        resources.items.forEach(async resKey => {
             commandBody = ResourcesCommands.getResource(resKey);
+            await SendCommand(commandBody, this.headers).then(response => {
+                resourcesDetails.push({
+                    resource: response.data.resource, type: response.data.type, resourceKey: resKey
+                });
+            })
+        });
+
+        this.setState({
+            payload: {
+                ...this.state.payload, resourcesDetails
+            }
         });
     }
 
@@ -69,6 +84,42 @@ export default class Resources extends MainComponent<ResourceState> {
             return;
         }
 
+        let destinationHeader = AppHeaders.buildBlipHeaders({ authorization: this.state.payload.destinationAuthorization });
+        this.handleRequestBotDestination(destinationHeader);
+    }
+
+    async handleRequestBotDestination(headers: object) {
+        let commandBody = getCheckConnectivity();
+        await SendCommand(commandBody, headers).then(async response => {
+
+            await this.CreateResourceDestination(headers).then(res => {
+                this.setAlert(
+                    `Os recursos foram transferidos para o chatbot de destino:
+                    ${Utilities.returnBotName(response.data.to)}`,
+                    'success'
+                )
+            });
+
+        }).catch(err => {
+            this.setAlert(
+                `Não foi possível identificar o chatbot pela chave informada! ${err.message}`,
+                'danger'
+            )
+        });
+    }
+
+    async CreateResourceDestination(destinationHeader: object) {
+        let commandBody;
+
+        this.state.payload.resourcesDetails.forEach(async resource => {
+            commandBody = ResourcesCommands.createResource(resource.resourceKey, resource.resource, resource.type);
+            await SendCommand(commandBody, destinationHeader).catch(err => {
+                this.setAlert(
+                    `Não foi possível realizar a criação de algum recurso! ${err.message}`,
+                    'danger'
+                )
+            })
+        });
     }
 
     isInvalid(): boolean {
@@ -95,7 +146,7 @@ export default class Resources extends MainComponent<ResourceState> {
                             Esta chave authorization é do chatbot de destino.
                         </div>
                     </div>
-                    <button type="submit" className="btn btn-success" onClick={() => this.handleSubmit()}>Validar Key</button>
+                    <button type="submit" className="btn btn-success" onClick={() => this.handleSubmit()}>Transferir recursos</button>
                 </div>
             </Layout>
         )

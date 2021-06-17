@@ -18,13 +18,13 @@ export default class ResourcesCommands {
         }
     }
 
-    static createResource(resourceKey: string, resource: string, type: string) {
+    static createResource(resourceKey: string, resource: string | object, type: string) {
         return {
             "id": `${Utilities.uuidv4()}`,
             "method": "set",
             "uri": `/resources/${resourceKey}`,
             "type": `${type}`,
-            "resource": `${resource}`
+            "resource": resource
         }
     }
 }
