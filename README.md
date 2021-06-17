@@ -1,6 +1,6 @@
 # Flow Version
 
-This app is able to get and publish a `json flow` to the bucket's chatbot, as well as import resources from one chatbot to another using the [blip](https://portal.blip.ai/) platform and its [commands](https://docs.blip.ai/#commands).
+This react app is able to get and publish a `json flow` to the bucket's chatbot, as well as import resources from one chatbot to another using the [blip platform](https://portal.blip.ai/) and its [commands](https://docs.blip.ai/#commands).
 
 ## Backup flow
 
